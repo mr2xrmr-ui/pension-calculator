@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>حاسبة التقاعد العسكري السعودي</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --g1:#064e29;--g2:#0a6e3f;--g3:#0d8a50;--g4:#12a861;--g5:#a8e6c3;
+  --gold:#b8820a;--gold-lt:#e8b84b;--gold-pale:#fef9ec;
+  --red:#b91c1c;--red-lt:#fee2e2;
+  --blue:#1d4ed8;--blue-lt:#dbeafe;
+  --dark:#0c1a10;--text:#1a2e1f;--muted:#5a7060;--border:#d1e5d8;
+  --white:#fff;--cream:#f8faf8;--card:#ffffff;
+  --shadow:0 2px 16px rgba(6,78,41,.08);--shadow-md:0 4px 24px rgba(6,78,41,.13);
+  --r:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 80% 60% at 15% 10%,rgba(10,110,63,.07) 0%,transparent 60%),
+             radial-gradient(ellipse 60% 50% at 85% 85%,rgba(184,130,10,.06) 0%,transparent 55%);
+  pointer-events:none;z-index:0}
+.wrap{max-width:820px;margin:0 auto;padding:28px 16px 80px;position:relative;z-index:1}
+.header{text-align:center;margin-bottom:32px;animation:fadeDown .6s ease both}
+.emblem{width:90px;height:90px;margin:0 auto 14px;
+background:linear-gradient(145deg,var(--g1) 0%,var(--g3) 60%,var(--g4) 100%);
+border-radius:50%;display:flex;align-items:center;justify-content:center;
+font-size:40px;box-shadow:0 6px 28px rgba(6,78,41,.40),inset 0 1px 0 rgba(255,255,255,.18)}
+.approx-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 16px;
+border-radius:20px;margin-bottom:10px;background:var(--red-lt);
+border:1.5px solid rgba(185,28,28,.3);font-size:.8rem;font-weight:700;color:var(--red)}
+.header h1{font-family:'Cairo',sans-serif;font-size:2.1rem;font-weight:900;color:var(--dark);line-height:1.15}
+.header h1 em{font-style:normal;color:var(--g2)}
+.header p{margin-top:6px;color:var(--muted);font-size:.9rem}
+.decree-badge{display:inline-block;margin-top:10px;padding:5px 18px;
+background:var(--gold-pale);border:1.5px solid rgba(184,130,10,.35);
+border-radius:20px;font-size:.8rem;font-weight:700;color:var(--gold)}
+.credit{margin-top:8px;font-size:.78rem;color:var(--muted);opacity:.7;letter-spacing:.5px}
+.card{background:var(--card);border-radius:var(--r);padding:28px 24px;
+box-shadow:var(--shadow);border:1px solid rgba(209,229,216,.7);margin-bottom:18px;
+animation:fadeUp .5s ease both}
+.card-hd{display:flex;align-items:center;gap:10px;margin-bottom:22px;
+padding-bottom:14px;border-bottom:2px solid rgba(10,110,63,.09)}
+.card-hd .ico{width:34px;height:34px;border-radius:9px;
+background:rgba(10,110,63,.09);display:flex;align-items:center;justify-content:center;font-size:17px}
+.card-hd span{font-family:'Cairo',sans-serif;font-size:1rem;font-weight:700;color:var(--g2)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:540px){.grid{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:7px}
+.field.full{grid-column:1/-1}
+label{font-size:.85rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:5px}
+select,input[type=number]{width:100%;padding:12px 14px;
+border:2px solid var(--border);border-radius:11px;
+font-family:'Tajawal',sans-serif;font-size:.98rem;color:var(--dark);
+background:var(--cream);transition:border-color .18s,box-shadow .18s,background .18s;
+outline:none;direction:rtl}
+select:focus,input[type=number]:focus{border-color:var(--g3);background:var(--white);
+box-shadow:0 0 0 4px rgba(10,110,63,.10)}
+.hint{font-size:.76rem;color:var(--muted);line-height:1.5}
+input#salary.filled{background:#f0faf4;font-weight:700;color:var(--g2);border-color:var(--g4)}
+.slider-wrap{display:flex;flex-direction:column;gap:6px}
+.sl-top{display:flex;justify-content:space-between;align-items:center}
+.sl-val{font-family:'Cairo',sans-serif;font-size:1.5rem;font-weight:900;color:var(--g2)}
+input[type=range]{-webkit-appearance:none;width:100%;height:7px;border-radius:4px;outline:none;cursor:pointer;direction:ltr}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;
+border-radius:50%;background:var(--white);border:3px solid var(--g2);
+box-shadow:0 2px 8px rgba(10,110,63,.3);transition:transform .15s}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
+.tabs{display:flex;gap:7px;flex-wrap:wrap;background:var(--cream);
+padding:6px;border-radius:12px;border:1px solid var(--border)}
+.tab{flex:1;padding:9px 10px;border-radius:8px;font-family:'Tajawal',sans-serif;
+font-size:.8rem;font-weight:700;border:none;background:transparent;
+color:var(--muted);cursor:pointer;transition:all .2s;text-align:center;white-space:nowrap;min-width:70px}
+.tab.active{background:var(--g2);color:var(--white);box-shadow:0 2px 10px rgba(10,110,63,.30)}
+.tab:not(.active):hover{background:rgba(10,110,63,.08);color:var(--g2)}
+.btn-calc{width:100%;padding:17px;margin-top:6px;
+background:linear-gradient(135deg,var(--g1) 0%,var(--g3) 100%);
+color:var(--white);border:none;border-radius:13px;
+font-family:'Cairo',sans-serif;font-size:1.1rem;font-weight:900;
+cursor:pointer;transition:transform .2s,box-shadow .2s;
+box-shadow:0 6px 22px rgba(6,78,41,.38);
+display:flex;align-items:center;justify-content:center;gap:10px}
+.btn-calc:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(6,78,41,.48)}
+.btn-calc:active{transform:translateY(0)}
+#results{display:none;animation:fadeUp .45s ease both}
+.res-banner{border-radius:var(--r);padding:24px 28px;margin-bottom:18px;
+background:linear-gradient(135deg,var(--g1) 0%,#0b5233 100%);
+color:var(--white);position:relative;overflow:hidden}
+.res-banner::after{content:'🎖️';position:absolute;left:-8px;top:-8px;
+font-size:110px;opacity:.06;line-height:1;pointer-events:none}
+.res-banner .rb-tag{font-size:.8rem;opacity:.65;margin-bottom:3px}
+.res-banner .rb-name{font-family:'Cairo',sans-serif;font-size:1.35rem;font-weight:900;margin-bottom:2px}
+.res-banner .rb-sub{font-size:.82rem;opacity:.6}
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+@media(max-width:480px){.metrics{grid-template-columns:1fr}}
+.metric{background:var(--white);border-radius:14px;padding:20px 18px;
+border:1px solid var(--border);box-shadow:var(--shadow);
+position:relative;overflow:hidden;transition:transform .2s}
+.metric:hover{transform:translateY(-2px)}
+.metric::after{content:'';position:absolute;top:0;right:0;width:4px;height:100%;border-radius:0 14px 14px 0}
+.metric.cg::after{background:var(--g3)}
+.metric.co::after{background:var(--gold-lt)}
+.metric.cb::after{background:#3b82f6}
+.metric.cr::after{background:var(--red)}
+.metric .mi{font-size:1.5rem;margin-bottom:8px;display:block}
+.metric .ml{font-size:.78rem;color:var(--muted);font-weight:600;margin-bottom:5px}
+.metric .mv{font-family:'Cairo',sans-serif;font-size:1.6rem;font-weight:900;color:var(--dark);line-height:1;margin-bottom:3px}
+.metric .mv .cur{font-size:.8rem;font-weight:700;color:var(--muted);margin-right:2px}
+.metric .mn{font-size:.73rem;color:var(--muted)}
+.prog-section{background:var(--white);border-radius:var(--r);padding:20px 22px;
+border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:18px}
+.prog-lbl{display:flex;justify-content:space-between;font-size:.84rem;
+font-weight:700;color:var(--text);margin-bottom:10px}
+.prog-lbl .pv{color:var(--g2);font-size:.98rem}
+.prog-bar{height:13px;background:rgba(10,110,63,.1);border-radius:7px;overflow:hidden;margin-bottom:7px}
+.prog-fill{height:100%;border-radius:7px;
+background:linear-gradient(to left,var(--g4),var(--g2));
+transition:width 1.1s cubic-bezier(.4,0,.2,1);width:0%}
+.prog-note{font-size:.76rem;color:var(--muted)}
+.bk-title-row{display:flex;justify-content:space-between;align-items:center;
+padding:14px 20px;background:rgba(10,110,63,.05);border-bottom:1px solid var(--border)}
+.bk-title-row .bk-tl{font-weight:700;font-size:.88rem;color:var(--g2);display:flex;align-items:center;gap:8px}
+.btn-copy{display:flex;align-items:center;gap:5px;padding:6px 14px;
+border-radius:8px;border:1.5px solid var(--border);background:var(--white);
+font-family:'Tajawal',sans-serif;font-size:.78rem;font-weight:700;
+color:var(--muted);cursor:pointer;transition:all .2s}
+.btn-copy:hover{border-color:var(--g3);color:var(--g2);background:rgba(10,110,63,.06)}
+.btn-copy.copied{border-color:var(--g3);color:var(--g2);background:rgba(10,110,63,.1)}
+.breakdown{background:var(--white);border-radius:var(--r);
+border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow);margin-bottom:18px}
+.bk-row{display:flex;justify-content:space-between;align-items:center;
+padding:12px 20px;border-bottom:1px solid rgba(209,229,216,.45);
+font-size:.88rem;transition:background .15s}
+.bk-row:last-child{border-bottom:none}
+.bk-row:hover{background:var(--cream)}
+.bk-row .rl{color:var(--muted);font-weight:500}
+.bk-row .rv{font-weight:700;color:var(--dark);font-family:'Cairo',sans-serif}
+.bk-row.total{background:rgba(10,110,63,.07)}
+.bk-row.total .rl{color:var(--g2);font-weight:700}
+.bk-row.total .rv{color:var(--g2);font-size:1.02rem}
+.alert{padding:12px 16px;border-radius:11px;font-size:.84rem;
+font-weight:500;line-height:1.6;display:flex;gap:9px;
+align-items:flex-start;margin-bottom:14px}
+.alert.info{background:var(--blue-lt);border:1px solid rgba(29,78,216,.2);color:#1e3a8a}
+.alert.warn{background:#fef9c3;border:1px solid rgba(184,130,10,.3);color:#713f12}
+.alert.error{background:var(--red-lt);border:1px solid rgba(185,28,28,.25);color:#7f1d1d}
+.alert .ai{font-size:17px;flex-shrink:0;margin-top:1px}
+.disclaimer{text-align:center;font-size:.76rem;color:var(--muted);
+line-height:1.75;padding:0 8px;margin-top:22px}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:400px){.card{padding:20px 14px}.header h1{font-size:1.65rem}.res-banner{padding:20px 18px}}
+.countdown-card{background:var(--card);border-radius:var(--r);padding:28px 24px;
+box-shadow:var(--shadow);border:1px solid rgba(209,229,216,.7);margin-bottom:18px;
+animation:fadeUp .5s ease both}
+.cd-result{display:none;margin-top:20px}
+.cd-banner{border-radius:14px;padding:22px 24px;
+background:linear-gradient(135deg,#0c2340 0%,#1a3a5c 100%);
+color:#fff;position:relative;overflow:hidden;margin-bottom:16px}
+.cd-banner::after{content:'⏳';position:absolute;left:-5px;top:-10px;
+font-size:100px;opacity:.07;line-height:1;pointer-events:none}
+.cd-banner .cb-lbl{font-size:.78rem;opacity:.6;margin-bottom:4px}
+.cd-banner .cb-name{font-family:'Cairo',sans-serif;font-size:1.2rem;font-weight:900;margin-bottom:2px}
+.cd-banner .cb-sub{font-size:.8rem;opacity:.55}
+.cd-boxes{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+@media(max-width:480px){.cd-boxes{grid-template-columns:repeat(2,1fr)}}
+.cd-box{background:#fff;border-radius:13px;padding:16px 10px;text-align:center;
+border:1px solid var(--border);box-shadow:var(--shadow)}
+.cd-box .cb-num{font-family:'Cairo',sans-serif;font-size:2rem;font-weight:900;line-height:1;margin-bottom:4px}
+.cd-box .cb-unit{font-size:.72rem;color:var(--muted);font-weight:600}
+.cd-box.years .cb-num{color:var(--g2)}
+.cd-box.months .cb-num{color:var(--gold)}
+.cd-box.days .cb-num{color:var(--blue)}
+.cd-box.age .cb-num{color:var(--red)}
+.cd-timeline{background:#fff;border-radius:13px;border:1px solid var(--border);padding:18px 20px;box-shadow:var(--shadow)}
+.cd-tl-title{font-family:'Cairo',sans-serif;font-size:.88rem;font-weight:700;color:var(--g2);margin-bottom:14px;display:flex;align-items:center;gap:6px}
+.cd-tl-row{display:flex;justify-content:space-between;align-items:center;
+padding:10px 0;border-bottom:1px solid rgba(209,229,216,.4);font-size:.86rem}
+.cd-tl-row:last-child{border-bottom:none}
+.cd-tl-row .tl-lbl{color:var(--muted);font-weight:500}
+.cd-tl-row .tl-val{font-weight:700;color:var(--dark);font-family:'Cairo',sans-serif}
+.cd-tl-row.highlight .tl-lbl{color:var(--g2);font-weight:700}
+.cd-tl-row.highlight .tl-val{color:var(--g2)}
+.cd-progress-wrap{margin-top:14px}
+.cd-prog-lbl{display:flex;justify-content:space-between;font-size:.8rem;font-weight:700;color:var(--text);margin-bottom:8px}
+.cd-prog-bar{height:11px;background:rgba(10,110,63,.1);border-radius:6px;overflow:hidden}
+.cd-prog-fill{height:100%;border-radius:6px;background:linear-gradient(to left,#3b82f6,#1d4ed8);transition:width 1.1s cubic-bezier(.4,0,.2,1);width:0%}
+.cd-alert-done{background:var(--gold-pale);border:1.5px solid rgba(184,130,10,.35);
+border-radius:12px;padding:14px 18px;font-size:.86rem;font-weight:600;
+color:var(--gold);display:flex;gap:8px;align-items:center;margin-bottom:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div class="emblem">🎖️</div>
+    <div class="approx-badge">⚠️ حاسبة تقريبية — الأرقام للاسترشاد فقط</div>
+    <h1>حاسبة <em>التقاعد العسكري</em></h1>
+    <p>المملكة العربية السعودية · نظام التقاعد العسكري</p>
+    <div class="decree-badge">وفق المرسوم الملكي م/24 لعام 1395هـ</div>
+    <div class="credit">تصميم · ياسر الأسمري</div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd">
+      <span class="ico">📝</span>
+      <span>بيانات الخدمة العسكرية</span>
+    </div>
+    <div class="grid">
+      <div class="field">
+        <label>🎗️ الرتبة العسكرية</label>
+        <select id="rank" onchange="onRankChange()">
+          <optgroup label="── الأفراد ──">
+            <option value="جندي">جندي</option>
+            <option value="جندي أول">جندي أول</option>
+            <option value="عريف">عريف</option>
+            <option value="وكيل رقيب">وكيل رقيب</option>
+            <option value="رقيب">رقيب</option>
+            <option value="رقيب أول">رقيب أول</option>
+            <option value="رئيس رقباء">رئيس رقباء</option>
+          </optgroup>
+          <optgroup label="── الضباط ──">
+            <option value="ملازم">ملازم</option>
+            <option value="ملازم أول">ملازم أول</option>
+            <option value="نقيب" selected>نقيب</option>
+            <option value="رائد">رائد</option>
+            <option value="مقدم">مقدم</option>
+            <option value="عقيد">عقيد</option>
+            <option value="عميد">عميد</option>
+            <option value="لواء">لواء</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="field">
+        <label>🏛️ الجهة العسكرية</label>
+        <select id="sector">
+          <option value="القوات المسلحة">القوات المسلحة (الدفاع)</option>
+          <option value="الحرس الوطني">الحرس الوطني</option>
+          <option value="وزارة الداخلية">قوات الأمن الداخلي</option>
+          <option value="الأمن العام">الأمن العام (الشرطة)</option>
+          <option value="الدفاع المدني">الدفاع المدني</option>
+          <option value="حرس الحدود">حرس الحدود</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>🏅 الدرجة الوظيفية</label>
+        <select id="grade" onchange="onGradeChange()">
+          <option value="">— اختر الدرجة —</option>
+        </select>
+        <span class="hint" id="grade-hint">اختر الرتبة أولاً</span>
+      </div>
+      <div class="field">
+        <label>💰 الراتب الأساسي (ريال)</label>
+        <input type="number" id="salary" placeholder="يُحدَّد تلقائياً" min="1000" max="300000">
+        <span class="hint">يتعبأ تلقائياً · يمكن التعديل يدوياً</span>
+      </div>
+      <div class="field full">
+        <label>📅 سنوات الخدمة الفعلية</label>
+        <div class="slider-wrap">
+          <div class="sl-top">
+            <span style="font-size:.8rem;color:var(--muted)">1 سنة</span>
+            <span class="sl-val" id="yearsVal">20</span>
+            <span style="font-size:.8rem;color:var(--muted)">40 سنة</span>
+          </div>
+          <input type="range" id="years" min="1" max="40" value="20"
+            oninput="document.getElementById('yearsVal').textContent=this.value;updateSlider(this)">
+          <span class="hint" id="yearsHint">✅ 20 سنة — يستحق معاشاً تقاعدياً</span>
+        </div>
+      </div>
+      <div class="field full">
+        <label>🔀 نوع الإحالة للتقاعد</label>
+        <div class="tabs">
+          <button class="tab active" onclick="setType(this,'normal')">🏅 نظامي</button>
+          <button class="tab" onclick="setType(this,'early')">⏩ مبكر</button>
+          <button class="tab" onclick="setType(this,'disability_partial')">🩺 عجز جزئي</button>
+          <button class="tab" onclick="setType(this,'disability_full')">🏥 عجز كلي</button>
+          <button class="tab" onclick="setType(this,'martyr')">☪️ استشهاد</button>
+        </div>
+      </div>
+    </div>
+    <button class="btn-calc" onclick="calculate()">
+      <span>⚖️</span> احسب حقوقي التقاعدية
+    </button>
+  </div>
+
+  <div id="results">
+    <div class="res-banner">
+      <div class="rb-tag">نتائج الحساب التقاعدي لـ</div>
+      <div class="rb-name" id="res-name">—</div>
+      <div class="rb-sub" id="res-sub">—</div>
+    </div>
+    <div id="alerts"></div>
+    <div class="metrics">
+      <div class="metric cg">
+        <span class="mi">📆</span>
+        <div class="ml">الراتب التقاعدي الشهري</div>
+        <div class="mv"><span class="cur">ر.س</span><span id="rv-monthly">—</span></div>
+        <div class="mn" id="rn-monthly">—</div>
+      </div>
+      <div class="metric co">
+        <span class="mi">🏆</span>
+        <div class="ml">مكافأة نهاية الخدمة</div>
+        <div class="mv"><span class="cur">ر.س</span><span id="rv-gratuity">—</span></div>
+        <div class="mn">تُصرف دفعةً واحدة</div>
+      </div>
+      <div class="metric cb">
+        <span class="mi">💎</span>
+        <div class="ml">إجمالي الحقوق الفورية</div>
+        <div class="mv"><span class="cur">ر.س</span><span id="rv-total">—</span></div>
+        <div class="mn">المكافأة + أول سنة معاش</div>
+      </div>
+      <div class="metric cr">
+        <span class="mi">📊</span>
+        <div class="ml">نسبة المعاش من الراتب</div>
+        <div class="mv"><span id="rv-pct">—</span><span class="cur">%</span></div>
+        <div class="mn" id="rn-pct">—</div>
+      </div>
+    </div>
+    <div class="prog-section">
+      <div class="prog-lbl">
+        <span>نسبة الاستحقاق من الراتب الأساسي</span>
+        <span class="pv" id="prog-pct">0%</span>
+      </div>
+      <div class="prog-bar"><div class="prog-fill" id="prog-fill"></div></div>
+      <div class="prog-note" id="prog-note">الحد الأقصى 100% عند 35 سنة</div>
+    </div>
+    <div class="breakdown">
+      <div class="bk-title-row">
+        <span class="bk-tl">🧮 تفاصيل الحساب خطوة بخطوة</span>
+        <button class="btn-copy" onclick="copySection('bk-rows',this)">📋 نسخ</button>
+      </div>
+      <div id="bk-rows"></div>
+    </div>
+    <div class="disclaimer">
+      ⚠️ هذه الحاسبة للتقدير التقريبي فقط بناءً على نظام التقاعد العسكري السعودي.<br>
+      الأرقام الفعلية تتوقف على قرارات المؤسسة العامة للتقاعد وقد تشمل بدلات إضافية.<br>
+      للحصول على رقم دقيق يُرجى التواصل مع <strong>المؤسسة العامة للتقاعد</strong> مباشرة.
+    </div>
+  </div>
+
+  <div class="countdown-card">
+    <div class="card-hd">
+      <span class="ico">⏳</span>
+      <span>كم باقي على تقاعدك؟</span>
+    </div>
+    <div class="grid">
+      <div class="field">
+        <label>🎗️ الرتبة العسكرية</label>
+        <select id="cd-rank" onchange="cdRankChange()">
+          <optgroup label="── الأفراد ──">
+            <option value="جندي">جندي</option>
+            <option value="جندي أول">جندي أول</option>
+            <option value="عريف">عريف</option>
+            <option value="وكيل رقيب">وكيل رقيب</option>
+            <option value="رقيب">رقيب</option>
+            <option value="رقيب أول">رقيب أول</option>
+            <option value="رئيس رقباء">رئيس رقباء</option>
+          </optgroup>
+          <optgroup label="── الضباط ──">
+            <option value="ملازم">ملازم</option>
+            <option value="ملازم أول">ملازم أول</option>
+            <option value="نقيب">نقيب</option>
+            <option value="رائد">رائد</option>
+            <option value="مقدم">مقدم</option>
+            <option value="عقيد">عقيد</option>
+            <option value="عميد">عميد</option>
+            <option value="لواء">لواء</option>
+          </optgroup>
+        </select>
+        <span class="hint" id="cd-ret-age-hint">سن التقاعد النظامي: —</span>
+      </div>
+      <div class="field">
+        <label>📅 تاريخ الميلاد (هجري)</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1.2fr;gap:8px">
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <span style="font-size:.72rem;color:var(--muted);text-align:center">اليوم</span>
+            <input type="number" id="cd-day" placeholder="يوم" min="1" max="30" style="text-align:center;padding:10px 6px" oninput="cdCalc()">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <span style="font-size:.72rem;color:var(--muted);text-align:center">الشهر</span>
+            <input type="number" id="cd-month" placeholder="شهر" min="1" max="12" style="text-align:center;padding:10px 6px" oninput="cdCalc()">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <span style="font-size:.72rem;color:var(--muted);text-align:center">السنة</span>
+            <input type="number" id="cd-year" placeholder="سنة هـ" min="1350" max="1430" style="text-align:center;padding:10px 6px" oninput="cdCalc()">
+          </div>
+        </div>
+        <span class="hint" id="cd-birth-hint">مثال: 15 / 6 / 1400 هـ</span>
+      </div>
+    </div>
+    <div class="cd-result" id="cd-result">
+      <div class="cd-banner">
+        <div class="cb-lbl">الوقت المتبقي على تقاعد</div>
+        <div class="cb-name" id="cb-name">—</div>
+        <div class="cb-sub" id="cb-sub">—</div>
+      </div>
+      <div id="cd-done-alert"></div>
+      <div class="cd-boxes">
+        <div class="cd-box years"><div class="cb-num" id="cd-yrs">—</div><div class="cb-unit">سنة</div></div>
+        <div class="cd-box months"><div class="cb-num" id="cd-mos">—</div><div class="cb-unit">شهر</div></div>
+        <div class="cd-box days"><div class="cb-num" id="cd-dys">—</div><div class="cb-unit">يوم</div></div>
+        <div class="cd-box age"><div class="cb-num" id="cd-age">—</div><div class="cb-unit">عمرك الآن</div></div>
+      </div>
+      <div class="cd-timeline">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <div class="cd-tl-title" style="margin-bottom:0">📋 تفاصيل وتواريخ مهمة</div>
+          <button class="btn-copy" onclick="copySection('cd-timeline-body',this)">📋 نسخ</button>
+        </div>
+        <div id="cd-timeline-body">
+          <div class="cd-tl-row"><span class="tl-lbl">تاريخ الميلاد الهجري</span><span class="tl-val" id="cd-t-hijri">—</span></div>
+          <div class="cd-tl-row"><span class="tl-lbl">تاريخ الميلاد الميلادي (تقريبي)</span><span class="tl-val" id="cd-t-greg">—</span></div>
+          <div class="cd-tl-row"><span class="tl-lbl">العمر الحالي</span><span class="tl-val" id="cd-t-age">—</span></div>
+          <div class="cd-tl-row"><span class="tl-lbl">سن التقاعد النظامي للرتبة</span><span class="tl-val" id="cd-t-retage">—</span></div>
+          <div class="cd-tl-row highlight"><span class="tl-lbl">تاريخ التقاعد المتوقع (ميلادي)</span><span class="tl-val" id="cd-t-retdate">—</span></div>
+          <div class="cd-tl-row highlight"><span class="tl-lbl">تاريخ التقاعد المتوقع (هجري)</span><span class="tl-val" id="cd-t-retdate-h">—</span></div>
+          <div class="cd-tl-row"><span class="tl-lbl">التقاعد المبكر الممكن (15 سنة خدمة)</span><span class="tl-val" id="cd-t-early">—</span></div>
+        </div>
+        <div class="cd-progress-wrap">
+          <div class="cd-prog-lbl">
+            <span>نسبة العمر المُنجَز نحو التقاعد</span>
+            <span id="cd-prog-pct" style="color:var(--blue)">0%</span>
+          </div>
+          <div class="cd-prog-bar"><div class="cd-prog-fill" id="cd-prog-fill"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SALARY={
+  "جندي":[3220,3350,3480,3610,3740,3870,4000,4130,4260,4390,4520,4650,4780,4910,5040],
+  "جندي أول":[3395,3540,3685,3830,3975,4120,4265,4410,4555,4700,4845,4990,5135,5280,5425],
+  "عريف":[3765,3940,4115,4290,4465,4640,4815,4990,5165,5340,5515,5690,5865,6040,6215],
+  "وكيل رقيب":[4455,4665,4875,5080,5295,5505,5715,5925,6135,6345,6555,6765,6975,7185,7395],
+  "رقيب":[5260,5510,5760,6010,6260,6510,6760,7010,7260,7510,7760,8010,8260,8510,8760],
+  "رقيب أول":[6180,6480,6780,7080,7380,7680,7980,8280,8580,8880,9180,9480,9780,10080,10380],
+  "رئيس رقباء":[7215,7575,7935,8295,8655,9015,9375,9735,10095,10455,10815,11175,11535,11895,12255],
+  "ملازم":[7800,8185,8570,8955,9340,9725,10110,10495,10880,11265,11650,12035,12420,12805,13190],
+  "ملازم أول":[8835,9275,9715,10155,10595,11035,11475,11915,12355,12795,13235,13675,14115,14555,14995],
+  "نقيب":[10600,11095,11590,12085,12580,13075,13570,13835,14100,14365,14630,14895,15160,15425,15690],
+  "رائد":[13515,13780,14045,14310,14575,14840,15105,15370,15635,15900,16165,16430,16695,16960,17225],
+  "مقدم":[14645,15115,15585,16055,16525,16995,17465,17935,18405,18875,19345,19815,20285,20755,null],
+  "عقيد":[16520,17110,17700,18290,18880,19470,20060,20650,21240,21830,22420,23010,23600,null,null],
+  "عميد":[18805,19455,20105,20755,21405,22055,22705,23355,24005,24655,25305,25955,null,null,null],
+  "لواء":[21390,22120,23580,23580,24310,25040,25770,26500,27230,27960,28690,null,null,null,null]
+};
+const GNAMES=["الأولى","الثانية","الثالثة","الرابعة","الخامسة","السادسة","السابعة","الثامنة","التاسعة","العاشرة","الحادية عشر","الثانية عشر","الثالثة عشر","الرابعة عشر","الخامسة عشر"];
+let retType='normal';
+const $=id=>document.getElementById(id);
+const fmt=n=>Math.round(n).toLocaleString('ar-SA');
+function setType(btn,t){document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');retType=t;}
+function updateSlider(s){
+  const p=((s.value-s.min)/(s.max-s.min))*100;
+  s.style.background=`linear-gradient(to right,var(--g3) ${p}%,var(--border) ${p}%)`;
+  const y=+s.value;
+  $('yearsHint').textContent=y<15?`⚠️ أقل من 15 سنة — لا يستحق معاشاً نظامياً`:y<18?`⚡ ${y} سنة — تقاعد مبكر ممكن بشروط`:y<25?`✅ ${y} سنة — يستحق معاشاً تقاعدياً`:y<35?`🌟 ${y} سنة — خدمة طويلة ومعاش مرتفع`:`🏆 ${y} سنة — وصل الحد الأقصى`;
+}
+function onRankChange(){
+  const rank=$('rank').value,gs=$('grade');
+  gs.innerHTML='<option value="">— اختر الدرجة —</option>';
+  $('salary').value='';$('salary').classList.remove('filled');
+  if(!SALARY[rank]){$('grade-hint').textContent='اختر الرتبة أولاً';return;}
+  SALARY[rank].forEach((s,i)=>{if(s!==null){const o=document.createElement('option');o.value=i;o.textContent=`${GNAMES[i]}  ·  ${s.toLocaleString('ar-SA')} ر.س`;gs.appendChild(o);}});
+  $('grade-hint').textContent=`${SALARY[rank].filter(x=>x).length} درجة متاحة`;
+}
+function onGradeChange(){
+  const rank=$('rank').value,gi=$('grade').value,si=$('salary');
+  if(rank&&gi!==''&&SALARY[rank]){const s=SALARY[rank][+gi];if(s){si.value=s;si.classList.add('filled');}}
+}
+function animCount(id,target){
+  const el=$(id);if(!el||!target)return;
+  const dur=900,t0=performance.now();
+  const go=now=>{const p=Math.min((now-t0)/dur,1),e=1-Math.pow(1-p,3);el.textContent=fmt(Math.round(target*e));if(p<1)requestAnimationFrame(go);};
+  requestAnimationFrame(go);
+}
+function row(lbl,val,tot=false){return`<div class="bk-row${tot?' total':''}"><span class="rl">${lbl}</span><span class="rv">${val}</span></div>`;}
+function alrt(type,ico,txt){return`<div class="alert ${type}"><span class="ai">${ico}</span><div>${txt}</div></div>`;}
+function calculate(){
+  const salary=parseFloat($('salary').value);
+  const years=+$('years').value;
+  const rank=$('rank').value;
+  const sector=$('sector').value;
+  if(!salary||salary<500){$('salary').style.borderColor='var(--red)';$('salary').focus();setTimeout(()=>$('salary').style.borderColor='',2000);return;}
+  const months=years*12;
+  const rawPension=(salary*months)/420;
+  const cappedPension=Math.min(rawPension,salary);
+  const pensionPct=Math.min((months/420)*100,100);
+  const gratuityBase=salary*years;
+  let monthly=0,gratuity=0,alerts='',bk='',pctNote='',monthlyNote='';
+  switch(retType){
+    case 'normal':
+      if(years<15){alerts+=alrt('error','❌',`خدمة <strong>${years} سنة</strong> غير كافية. الحد الأدنى <strong>15 سنة</strong> للتقاعد المبكر و<strong>18 سنة</strong> للنظامي.`);monthly=0;gratuity=gratuityBase;monthlyNote='غير مستحق للمعاش الشهري';pctNote='دون الحد الأدنى';}
+      else{monthly=cappedPension;gratuity=gratuityBase;monthlyNote=`${Math.round(pensionPct)}% من الراتب الأساسي`;pctNote=years>=35?'الحد الأقصى المسموح':'معادلة: (الراتب × الأشهر) ÷ 420';if(years<18)alerts+=alrt('warn','⚠️',`خدمة ${years} سنة تُعدّ <strong>تقاعداً مبكراً</strong> وتحتاج موافقة الوزير المختص.`);if(years>=35)alerts+=alrt('info','🏆',`وصلتَ الحد الأقصى! المعاش يعادل <strong>الراتب الأساسي كاملاً (100%)</strong>.`);}
+      bk=row('الراتب الأساسي الأخير',`${fmt(salary)} ر.س`)+row('مدة الخدمة',`${months} شهر (${years} سنة)`)+row('مقام المعادلة (35×12)','420 شهر')+row('المعاش الحسابي قبل التسقيف',`${fmt(rawPension)} ر.س`)+(rawPension>salary?row('الحد الأقصى (لا يتجاوز الراتب)',`${fmt(salary)} ر.س`):'')+row('✅ المعاش الشهري الصافي',`${fmt(monthly)} ر.س`,true)+row('مكافأة نهاية الخدمة (راتب×سنوات)',`${fmt(gratuity)} ر.س`);
+      break;
+    case 'early':
+      if(years<15){alerts+=alrt('error','❌','التقاعد المبكر يشترط <strong>15 سنة خدمة فعلية</strong> على الأقل.');monthly=0;gratuity=0;}
+      else{monthly=cappedPension;gratuity=gratuityBase;monthlyNote=`${Math.round(pensionPct)}% من الراتب الأساسي`;pctNote='تقاعد مبكر بموافقة الوزير';alerts+=alrt('info','ℹ️','التقاعد المبكر يُحسب بنفس المعادلة النظامية ويتطلب <strong>موافقة الوزير المختص</strong>.');}
+      bk=row('الراتب الأساسي',`${fmt(salary)} ر.س`)+row('أشهر الخدمة',`${months} شهر`)+row('المعاش الحسابي',`${fmt(rawPension)} ر.س`)+row('✅ المعاش الشهري',`${fmt(monthly)} ر.س`,true)+row('مكافأة نهاية الخدمة',`${fmt(gratuity)} ر.س`);
+      break;
+    case 'disability_partial':
+      monthly=Math.max(cappedPension,salary*0.75);gratuity=gratuityBase;monthlyNote='لا يقل عن 75% من الراتب الأساسي';pctNote='عجز جزئي بسبب الخدمة';
+      alerts+=alrt('info','🩺','العجز الجزئي بسبب الخدمة: المعاش <strong>لا يقل عن 75% من آخر راتب أساسي</strong>.');
+      bk=row('المعاش الحسابي (المعادلة)',`${fmt(cappedPension)} ر.س`)+row('الحد الأدنى للعجز الجزئي (75%)',`${fmt(salary*0.75)} ر.س`)+row('✅ المعاش المُعتمد',`${fmt(monthly)} ر.س`,true)+row('مكافأة نهاية الخدمة',`${fmt(gratuity)} ر.س`);
+      break;
+    case 'disability_full':
+      monthly=salary;gratuity=gratuityBase;monthlyNote='آخر راتب أساسي كاملاً (100%)';pctNote='عجز كلي — الحد الأقصى';
+      alerts+=alrt('info','🏥','العجز الكلي بسبب الخدمة: يُمنح العسكري معاشاً يعادل <strong>آخر راتب أساسي كاملاً</strong>.');
+      bk=row('آخر راتب أساسي',`${fmt(salary)} ر.س`)+row('نسبة العجز الكلي','100% من الراتب')+row('✅ المعاش الشهري',`${fmt(monthly)} ر.س`,true)+row('مكافأة نهاية الخدمة',`${fmt(gratuity)} ر.س`);
+      break;
+    case 'martyr':{
+      monthly=salary;const bonusMonths=24;gratuity=gratuityBase+(salary*bonusMonths);monthlyNote='آخر راتب الشهيد كاملاً للمستحقين';pctNote='استشهاد في سبيل الواجب';
+      alerts+=alrt('info','☪️','معاش الشهيد: يُصرف للمستحقين <strong>آخر راتب الشهيد كاملاً</strong> شهرياً + مكافأة الاستشهاد (24 شهراً إضافياً).');
+      bk=row('آخر راتب الشهيد الأساسي',`${fmt(salary)} ر.س`)+row('✅ معاش المستحقين الشهري',`${fmt(monthly)} ر.س`,true)+row('مكافأة نهاية الخدمة الأساسية',`${fmt(gratuityBase)} ر.س`)+row(`مكافأة الاستشهاد الإضافية (${bonusMonths} شهر)`,`${fmt(salary*bonusMonths)} ر.س`)+row('✅ إجمالي المكافأة',`${fmt(gratuity)} ر.س`,true);
+      break;}
+  }
+  const totalFirstYear=gratuity+(monthly*12);
+  const finalPct=Math.min(monthly>0?(monthly/salary)*100:0,100);
+  $('results').style.display='block';
+  setTimeout(()=>$('results').scrollIntoView({behavior:'smooth',block:'start'}),50);
+  $('res-name').textContent=`${rank} — ${sector}`;
+  $('res-sub').textContent=`خدمة ${years} سنة · راتب ${fmt(salary)} ر.س · ${retType==='normal'?'تقاعد نظامي':retType==='early'?'تقاعد مبكر':retType==='disability_partial'?'عجز جزئي':retType==='disability_full'?'عجز كلي':'استشهاد'}`;
+  $('alerts').innerHTML=alerts;
+  $('bk-rows').innerHTML=bk;
+  $('rn-monthly').textContent=monthlyNote;
+  $('rn-pct').textContent=pctNote;
+  $('prog-pct').textContent=Math.round(finalPct)+'%';
+  $('prog-note').textContent=finalPct>=100?'🏆 وصلتَ الحد الأقصى للمعاش':`${Math.round(100-finalPct)}% متبقية للحد الأقصى`;
+  setTimeout(()=>$('prog-fill').style.width=finalPct+'%',80);
+  animCount('rv-monthly',monthly);
+  animCount('rv-gratuity',gratuity);
+  animCount('rv-total',totalFirstYear);
+  $('rv-pct').textContent=Math.round(finalPct);
+}
+const RET_AGE={"جندي":44,"جندي أول":44,"عريف":46,"وكيل رقيب":48,"رقيب":50,"رقيب أول":50,"رئيس رقباء":52,"ملازم":42,"ملازم أول":44,"نقيب":46,"رائد":48,"مقدم":50,"عقيد":52,"عميد":54,"لواء":56};
+const _hfmt=new Intl.DateTimeFormat('en-u-ca-islamic-umalqura',{year:'numeric',month:'numeric',day:'numeric'});
+function toHijri(date){const parts=_hfmt.formatToParts(date);const get=t=>parseInt(parts.find(p=>p.type===t).value);return{y:get('year'),m:get('month'),d:get('day')};}
+function gregorianToHijri(date){return toHijri(date);}
+function hijriToGregorian(hY,hM,hD){
+  const estYear=Math.round(hY*0.970225+621.5);
+  const estDate=new Date(estYear,5,1);
+  let lo=new Date(estDate);lo.setDate(lo.getDate()-400);
+  let hi=new Date(estDate);hi.setDate(hi.getDate()+400);
+  while(lo<=hi){
+    const mid=new Date((lo.getTime()+hi.getTime())/2);mid.setHours(0,0,0,0);
+    const h=toHijri(mid);
+    if(h.y===hY&&h.m===hM&&h.d===hD)return mid;
+    const diff=(h.y-hY)*354+(h.m-hM)*29+(h.d-hD);
+    if(diff<0)lo=new Date(mid.getTime()+86400000);else hi=new Date(mid.getTime()-86400000);
+  }
+  return new Date(estYear,5,1);
+}
+const H_MONTHS_AR=['','محرم','صفر','ربيع الأول','ربيع الثاني','جمادى الأولى','جمادى الآخرة','رجب','شعبان','رمضان','شوال','ذو القعدة','ذو الحجة'];
+const M_MONTHS_AR=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+function fmtHijri(y,m,d){return`${d} ${H_MONTHS_AR[m]} ${y} هـ`;}
+function fmtGreg(date){return`${date.getDate()} ${M_MONTHS_AR[date.getMonth()]} ${date.getFullYear()}`;}
+function cdRankChange(){const rank=document.getElementById('cd-rank').value;const age=RET_AGE[rank]||'—';document.getElementById('cd-ret-age-hint').textContent=`سن التقاعد النظامي للرتبة: ${age} سنة`;cdCalc();}
+function cdCalc(){
+  const hD=+document.getElementById('cd-day').value;
+  const hM=+document.getElementById('cd-month').value;
+  const hY=+document.getElementById('cd-year').value;
+  const rank=document.getElementById('cd-rank').value;
+  if(!hD||!hM||!hY||hY<1350||hY>1430||hM<1||hM>12||hD<1||hD>30)return;
+  const retAge=RET_AGE[rank];
+  const birthGreg=hijriToGregorian(hY,hM,hD);
+  if(isNaN(birthGreg.getTime()))return;
+  const today=new Date();today.setHours(0,0,0,0);
+  let ageYr=today.getFullYear()-birthGreg.getFullYear();
+  let ageMo=today.getMonth()-birthGreg.getMonth();
+  let ageDy=today.getDate()-birthGreg.getDate();
+  if(ageDy<0)ageMo--;
+  if(ageMo<0){ageYr--;ageMo+=12;}
+  const ageFloor=ageYr;const ageMos=Math.abs(ageMo);
+  const retDate=new Date(birthGreg);retDate.setFullYear(birthGreg.getFullYear()+retAge);
+  const alreadyRetired=today>=retDate;
+  let remYears=0,remMonths=0,remDays=0;
+  if(!alreadyRetired){
+    let ry=retDate.getFullYear()-today.getFullYear();
+    let rm=retDate.getMonth()-today.getMonth();
+    let rd=retDate.getDate()-today.getDate();
+    if(rd<0){rm--;const daysInPrevMonth=new Date(retDate.getFullYear(),retDate.getMonth(),0).getDate();rd+=daysInPrevMonth;}
+    if(rm<0){ry--;rm+=12;}
+    remYears=ry;remMonths=rm;remDays=rd;
+  }
+  const birthH=gregorianToHijri(birthGreg);
+  const retH=gregorianToHijri(retDate);
+  const earlyRet=new Date(birthGreg);earlyRet.setFullYear(birthGreg.getFullYear()+33);
+  const earlyH=gregorianToHijri(earlyRet);
+  const ageDecimal=ageFloor+ageMos/12;
+  const progPct=Math.min(Math.round((ageDecimal/retAge)*100),100);
+  document.getElementById('cd-result').style.display='block';
+  document.getElementById('cb-name').textContent=rank;
+  document.getElementById('cb-sub').textContent=alreadyRetired?'🎉 بلغتَ سن التقاعد النظامي — تهانينا!':`سن التقاعد النظامي: ${retAge} سنة`;
+  if(alreadyRetired){document.getElementById('cd-done-alert').innerHTML=`<div class="cd-alert-done">🎉 لقد بلغتَ أو تجاوزتَ سن التقاعد النظامي لرتبة ${rank}. تهانينا!</div>`;document.getElementById('cd-yrs').textContent='0';document.getElementById('cd-mos').textContent='0';document.getElementById('cd-dys').textContent='0';}
+  else{document.getElementById('cd-done-alert').innerHTML='';document.getElementById('cd-yrs').textContent=remYears;document.getElementById('cd-mos').textContent=remMonths;document.getElementById('cd-dys').textContent=remDays;}
+  document.getElementById('cd-age').textContent=`${ageFloor}`;
+  document.getElementById('cd-t-hijri').textContent=fmtHijri(hY,hM,hD);
+  document.getElementById('cd-t-greg').textContent=fmtGreg(birthGreg);
+  document.getElementById('cd-t-age').textContent=`${ageFloor} سنة و${ageMos} شهر`;
+  document.getElementById('cd-t-retage').textContent=`${retAge} سنة`;
+  document.getElementById('cd-t-retdate').textContent=fmtGreg(retDate);
+  document.getElementById('cd-t-retdate-h').textContent=fmtHijri(retH.y,retH.m,retH.d);
+  document.getElementById('cd-t-early').textContent=`${fmtGreg(earlyRet)} (${fmtHijri(earlyH.y,earlyH.m,earlyH.d)})`;
+  document.getElementById('cd-prog-pct').textContent=progPct+'%';
+  setTimeout(()=>{document.getElementById('cd-prog-fill').style.width=progPct+'%';},80);
+}
+function copySection(id,btn){
+  const el=document.getElementById(id);if(!el)return;
+  let lines=[];
+  el.querySelectorAll('.bk-row').forEach(r=>{const l=r.querySelector('.rl');const v=r.querySelector('.rv');if(l&&v)lines.push(`${l.textContent.trim()}:  ${v.textContent.trim()}`);});
+  el.querySelectorAll('.cd-tl-row').forEach(r=>{const l=r.querySelector('.tl-lbl');const v=r.querySelector('.tl-val');if(l&&v)lines.push(`${l.textContent.trim()}:  ${v.textContent.trim()}`);});
+  if(!lines.length)lines=[el.innerText.replace(/\n+/g,'\n').trim()];
+  const text=lines.join('\n');
+  navigator.clipboard.writeText(text).then(()=>{btn.classList.add('copied');const orig=btn.innerHTML;btn.innerHTML='✅ تم النسخ';setTimeout(()=>{btn.innerHTML=orig;btn.classList.remove('copied');},2000);}).catch(()=>{const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);btn.classList.add('copied');const orig=btn.innerHTML;btn.innerHTML='✅ تم النسخ';setTimeout(()=>{btn.innerHTML=orig;btn.classList.remove('copied');},2000);});
+}
+window.onload=()=>{const s=$('years');updateSlider(s);onRankChange();cdRankChange();};
+</script>
+</body>
+</html>
